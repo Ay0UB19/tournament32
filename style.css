@@ -1,0 +1,121 @@
+:root{
+  --bg:#070707;
+  --panel:#0f0f0f;
+  --muted:#bdbdbd;
+  --gold: linear-gradient(90deg,#d4af37,#ffde7a);
+  --accent:#d4af37;
+  --white:#ffffff;
+  --glass: rgba(255,255,255,0.03);
+  --card-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  --radius:14px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  min-height:100%;
+  background: radial-gradient(ellipse at top left, rgba(212,175,55,0.05), transparent 20%), var(--bg);
+  color:var(--white);
+  font-family: "Cairo", system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  direction:rtl;
+}
+
+/* Top bar */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px 28px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  background: linear-gradient(0deg, rgba(255,255,255,0.01), transparent);
+}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{
+  width:56px;height:56px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg, rgba(212,175,55,0.18), rgba(212,175,55,0.06));
+  font-size:28px;color:var(--white);box-shadow:0 6px 18px rgba(0,0,0,0.6)
+}
+.topbar h1{margin:0;font-size:18px}
+.sub{margin:0;font-size:12px;color:var(--muted)}
+
+/* Buttons */
+.btn{
+  padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);
+  background:transparent;color:var(--white);cursor:pointer;font-weight:600;margin-left:8px;
+  box-shadow: var(--card-shadow);
+}
+.btn.gold{
+  background:linear-gradient(90deg,#2b2b2b, rgba(255,255,255,0.02));
+  border: 1px solid rgba(212,175,55,0.25);
+  position:relative;
+}
+.btn.gold::after{
+  content:"";position:absolute;inset:0;border-radius:10px;
+  background: linear-gradient(90deg, rgba(212,175,55,0.1), rgba(255,255,255,0.01));
+  mix-blend-mode:overlay;
+}
+
+/* Layout */
+.container{
+  display:grid;
+  grid-template-columns: 260px 1fr 260px;
+  gap:18px;
+  padding:20px;
+  align-items:start;
+}
+
+/* Teams panel */
+.teams-panel{
+  background:var(--panel);padding:16px;border-radius:var(--radius);box-shadow:var(--card-shadow);
+}
+.teams-panel h2{margin:0 0 12px 0}
+.teams-list{padding-left:16px;margin:0; max-height:60vh; overflow:auto}
+.teams-list li{padding:8px;border-radius:8px;margin-bottom:6px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));font-weight:600}
+
+/* Bracket area */
+.bracket-area{
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  padding:18px;border-radius:var(--radius);box-shadow:var(--card-shadow);
+  overflow:auto;height:70vh;
+}
+.rounds{
+  display:flex;gap:18px;align-items:flex-start;
+  min-width:1000px;padding-bottom:18px;
+}
+.round{
+  min-width:220px;background:var(--glass);padding:12px;border-radius:12px;
+  border:1px solid rgba(255,255,255,0.03);
+}
+.round h3{text-align:center;margin:6px 0 12px 0;font-size:15px}
+.match{
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  padding:8px;border-radius:10px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.03);
+  display:flex;flex-direction:column;gap:8px;
+}
+.team-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.team-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;}
+.input-score{width:60px;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--white);text-align:center}
+.btn-confirm{padding:6px 8px;border-radius:8px;border:none;background:transparent;color:var(--accent);cursor:pointer;font-weight:700}
+.match .winner{background: linear-gradient(90deg, rgba(212,175,55,0.06), transparent);border-left:4px solid rgba(212,175,55,0.2);padding-left:8px;border-radius:6px}
+
+/* champion card */
+.champ-card{background:linear-gradient(180deg, rgba(212,175,55,0.04), rgba(255,255,255,0.01));padding:16px;border-radius:12px;text-align:center;margin-bottom:18px}
+#champion{font-size:18px;font-weight:800;color:var(--accent);margin-top:8px}
+
+/* info */
+.info-panel{display:flex;flex-direction:column;gap:12px}
+.legend{background:var(--panel);padding:12px;border-radius:12px;color:var(--muted);font-size:13px}
+
+/* footer */
+.footer{padding:16px;text-align:center;color:var(--muted);border-top:1px solid rgba(255,255,255,0.02)}
+
+/* responsive */
+@media (max-width:1000px){
+  .container{grid-template-columns: 1fr;grid-template-rows:auto; padding:12px}
+  .bracket-area{order:3}
+  .teams-panel{order:1}
+  .info-panel{order:2;flex-direction:row;gap:8px}
+}
