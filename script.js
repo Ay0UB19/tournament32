@@ -2,38 +2,38 @@
 // بيانات الفرق (مَحفوظة من عند المستخدم)
 // أعدت كتابتهم بحروف عادية (حافظت على الاحرف الكبيرة)
 const initialTeams = [
-  "ＲＥＡＬ ＭＡＤＲＩＤ",
-  "ＡＴＬＥＴＩＣＯ ＭＡＤＲＩＤ",
-  "ＦＣ ＢＡＲＣＥＬＯＮＡ",
-  "ＶＩＬＬＡＲＥＡＬ",
-  "ＳＥＶＩＬＬＡ",
-  "ＭＡＮ ＵＴＤ",
-  "ＬＩＶＥＲＰＯＯＬ",
-  "ＭＡＮＣＩＴＹ",
-  "ＴＯＴＴＥＮＨＡＭ",
-  "ＮＥＷＣＡＳＴＬＥ ＵＮＩＴＥＤ",
-  "ＡＲＳＥＮＡＬ",
-  "ＣＨＥＬＳＥＡ",
-  "ＡＣ ＭＩＬＡＮ",
-  "ＩＮＴＥＲ  ＭＩＬＡＮ",
-  "ＲＯＭＡ",
-  "ＪＵＶＥＮＴＵＳ",
-  "ＮＡＰＯＬＩ",
-  "ＢＡＹＥＲＮ ＭＵＮＣＨＥＮ",
-  "ＬＥＶＥＲＫＵＳＥＮ",
-  "ＤＯＲＴＭＵＮＤ",
-  "ＰＳＧ",
-  "ＭＡＲＳＥＩＬＬＥ",
-  "ＭＯＮＡＣＯ",
-  "ＡＬ ＮＡＳＲ",
-  "ＡＬ ＨＩＬＡＬ",
-  "ＳＰＯＲＴＩＮＧ ＬＩＳＢＯＮ",
-  "ＢＥＮＦＩＣＡ",
-  "ＡＪＡＸ",
-  "ＰＳＶ",
-  "ＦＬＡＭＥＮＧＯ",
-  "ＲＩＶＥＲ ＰＬＡＴＥ",
-  "ＮＯＴＴＩＮＧＨＡＭ ＦＯＲＥＳＴ"
+  "REAL MADRID",
+  "ATLETICO MADRID",
+  "FC BARCELONA",
+  "VILLARREAL",
+  "SEVILLA",
+  "MAN UTD",
+  "LIVERPOOL",
+  "MANCITY",
+  "TOTTENHAM",
+  "NEWCASTLE UNITED",
+  "ARSENAL",
+  "CHELSEA",
+  "AC MILAN",
+  "INTER MILAN",
+  "ROMA",
+  "JUVENTUS",
+  "NAPOLI",
+  "BAYERN MUNCHEN",
+  "LEVERKUSEN",
+  "DORTMUND",
+  "PSG",
+  "MARSEILLE",
+  "MONACO",
+  "AL NASR",
+  "AL HILAL",
+  "SPORTING LISBON",
+  "BENFICA",
+  "AJAX",
+  "PSV",
+  "FLAMENGO",
+  "RIVER PLATE",
+  "NOTTINGHAM FOREST"
 ];
 
 // ---- إعداد البطولة ----
@@ -141,6 +141,7 @@ function renderAll(){
 function createMatchElement(match, roundIndex, matchIndex){
   const wrap = document.createElement("div");
   wrap.className = "match";
+  
   // فريق A
   const rowA = document.createElement("div");
   rowA.className = "team-row";
@@ -149,10 +150,14 @@ function createMatchElement(match, roundIndex, matchIndex){
   nameA.title = match.teamA;
   nameA.textContent = match.teamA;
   const inputA = document.createElement("input");
-  inputA.type = "number"; inputA.min = 0; inputA.className = "input-score";
-  inputA.placeholder = "-"; if (match.scoreA !== null) inputA.value = match.scoreA;
+  inputA.type = "number"; 
+  inputA.min = 0; 
+  inputA.className = "input-score";
+  inputA.placeholder = "-"; 
+  if (match.scoreA !== null) inputA.value = match.scoreA;
 
-  rowA.appendChild(nameA); rowA.appendChild(inputA);
+  rowA.appendChild(nameA); 
+  rowA.appendChild(inputA);
 
   // فريق B
   const rowB = document.createElement("div");
@@ -162,22 +167,27 @@ function createMatchElement(match, roundIndex, matchIndex){
   nameB.title = match.teamB;
   nameB.textContent = match.teamB;
   const inputB = document.createElement("input");
-  inputB.type = "number"; inputB.min = 0; inputB.className = "input-score";
-  inputB.placeholder = "-"; if (match.scoreB !== null) inputB.value = match.scoreB;
+  inputB.type = "number"; 
+  inputB.min = 0; 
+  inputB.className = "input-score";
+  inputB.placeholder = "-"; 
+  if (match.scoreB !== null) inputB.value = match.scoreB;
 
-  rowB.appendChild(nameB); rowB.appendChild(inputB);
+  rowB.appendChild(nameB); 
+  rowB.appendChild(inputB);
 
   // أزرار تأكيد و مسح
   const actions = document.createElement("div");
-  actions.style.display="flex"; actions.style.justifyContent="space-between"; actions.style.gap="8px";
+  actions.className = "match-actions";
   const confirmBtn = document.createElement("button");
   confirmBtn.className = "btn-confirm";
   confirmBtn.textContent = "تأكيد";
   const clearBtn = document.createElement("button");
-  clearBtn.className = "btn-confirm";
+  clearBtn.className = "btn-clear";
   clearBtn.textContent = "مسح";
 
-  actions.appendChild(clearBtn); actions.appendChild(confirmBtn);
+  actions.appendChild(clearBtn); 
+  actions.appendChild(confirmBtn);
 
   wrap.appendChild(rowA);
   wrap.appendChild(rowB);
@@ -188,24 +198,25 @@ function createMatchElement(match, roundIndex, matchIndex){
     const aVal = inputA.value.trim();
     const bVal = inputB.value.trim();
     if(aVal === "" || bVal === ""){
-      alert("دخل النتيجة للجانبين أولاً");
+      alert("يرجى إدخال النتيجة للجانبين أولاً");
       return;
     }
     const a = parseInt(aVal,10);
     const b = parseInt(bVal,10);
     if(Number.isNaN(a) || Number.isNaN(b) || a < 0 || b < 0){
-      alert("دخل نتيجة صالحة (0 أو أكثر)");
+      alert("يرجى إدخال نتيجة صالحة (0 أو أكثر)");
       return;
     }
 
     // تحديث البيانات في المصفوفة
-    match.scoreA = a; match.scoreB = b;
+    match.scoreA = a; 
+    match.scoreB = b;
     match.decided = true;
 
     // تحديد الفائز (لو تعادل -> نفتح نافذة لتحديد الفائز يدوياً)
     if(a === b){
       // نعطي المستخدم خيار: ضربات ترجيح؟ هنا نطلب اختيار يدوياً
-      const pick = confirm("النتيجة تعادل. اضغط OK لتعيين الفريق الأول فائز، Cancel لتعيين الفريق الثاني فائز.");
+      const pick = confirm("النتيجة تعادل. اضغط موافق لتعيين الفريق الأول فائز، أو إلغاء لتعيين الفريق الثاني فائز.");
       if(pick) advanceWinner(roundIndex, matchIndex, "A");
       else advanceWinner(roundIndex, matchIndex, "B");
     } else {
@@ -219,7 +230,9 @@ function createMatchElement(match, roundIndex, matchIndex){
 
   // مسح النتيجة
   clearBtn.addEventListener("click", ()=>{
-    match.scoreA = null; match.scoreB = null; match.decided = false;
+    match.scoreA = null; 
+    match.scoreB = null; 
+    match.decided = false;
     // أيضًا يجب ازالة أي تقدم سابق من الجولات الأعلى اعتماداً على هذه المباراة
     removeAdvancementFrom(roundIndex, matchIndex);
     renderAll();
@@ -300,7 +313,10 @@ function removeAdvancementFrom(roundIndex, matchIndex){
 // تحديث البطاقة العليا (البطل) وفق حالة النهائي
 function updateChampion(){
   const lastRound = rounds[rounds.length-1];
-  if(!lastRound) { champCard.textContent = "—"; return; }
+  if(!lastRound) { 
+    champCard.textContent = "—"; 
+    return; 
+  }
   const finalMatch = lastRound[0];
   if(finalMatch && finalMatch.decided){
     // من الممكن أننا لم نُحدث البطل عبر advanceWinner إن كانت النهاية يدوية
@@ -318,14 +334,86 @@ initRounds(currentTeams);
 
 // زر إعادة القرعة (خلط الفرق ثم إعادة ضبط)
 shuffleBtn.addEventListener("click", ()=>{
-  if(!confirm("كتأكد تدير قرعة جديدة؟ هذا سيمسح أي نتائج مدخلة حالياً.")) return;
+  if(!confirm("هل تريد حقاً إجراء قرعة جديدة؟ هذا سيمسح أي نتائج مدخلة حالياً.")) return;
   currentTeams = shuffle(initialTeams);
   initRounds(currentTeams);
 });
 
 // زر إعادة ضبط البطولات (يعيد نفس الترتيب الأصلي الحالي بدون خلط)
 resetBtn.addEventListener("click", ()=>{
-  if(!confirm("إعادة ضبط كامل البطولة؟")) return;
+  if(!confirm("هل تريد إعادة ضبط كامل البطولة؟")) return;
   currentTeams = currentTeams.slice(); // نفس الترتيب الحالي
   initRounds(currentTeams);
+});
+
+// دالة للحفظ في Firebase (إضافة جديدة)
+async function saveTournamentData() {
+  try {
+    const tournamentData = {
+      teams: currentTeams,
+      rounds: rounds,
+      lastUpdated: new Date()
+    };
+    
+    // حفظ البيانات في Firebase
+    // (يجب استيراد دوال Firebase أولاً)
+    const docRef = await addDoc(collection(db, "tournaments"), tournamentData);
+    console.log("تم حفظ البيانات بنجاح، المعرف: ", docRef.id);
+    return true;
+  } catch (error) {
+    console.error("خطأ في حفظ البيانات: ", error);
+    return false;
+  }
+}
+
+// دالة لتحميل البيانات من Firebase (إضافة جديدة)
+async function loadTournamentData() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "tournaments"));
+    if (!querySnapshot.empty) {
+      // نأخذ أحدث وثيقة
+      const latestDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+      const data = latestDoc.data();
+      
+      currentTeams = data.teams;
+      rounds = data.rounds;
+      
+      renderAll();
+      console.log("تم تحميل البيانات بنجاح");
+      return true;
+    }
+  } catch (error) {
+    console.error("خطأ في تحميل البيانات: ", error);
+    return false;
+  }
+}
+
+// إضافة أزرار الحفظ والتحميل لواجهة المستخدم (إضافة جديدة)
+function addSaveLoadButtons() {
+  const controlsDiv = document.querySelector('.controls');
+  
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'btn btn-primary';
+  saveBtn.textContent = 'حفظ البطولة';
+  saveBtn.addEventListener('click', saveTournamentData);
+  
+  const loadBtn = document.createElement('button');
+  loadBtn.className = 'btn btn-primary';
+  loadBtn.textContent = 'تحميل البطولة';
+  loadBtn.addEventListener('click', loadTournamentData);
+  
+  controlsDiv.appendChild(saveBtn);
+  controlsDiv.appendChild(loadBtn);
+}
+
+// تهيئة Firebase (إضافة جديدة)
+function initFirebase() {
+  // التهيئة موجودة في HTML
+  console.log("Firebase جاهز للاستخدام");
+}
+
+// عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+  initFirebase();
+  addSaveLoadButtons();
 });
