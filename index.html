@@ -1,55 +1,108 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>بطولة eFootball — الخنفشاري</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>بطولة</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">⚽</div>
-      <div>
-        <h1>بطولة eFootball — الخنفشاري</h1>
-        <p class="sub">32 فريق — إدخل النتائج و شوف الطريق نحو النهائي</p>
-      </div>
-    </div>
-    <div class="controls">
-      <button id="shuffleBtn" class="btn gold">إجراء القرعة (خلط الفرق)</button>
-      <button id="resetBtn" class="btn">إعادة ضبط البطولة</button>
-    </div>
-  </header>
+  <h1 class="main-title">بطولة</h1>
+  <div id="bracket"></div>
+  <div id="winner" class="winner"></div>
 
-  <main class="container">
-    <aside class="teams-panel">
-      <h2>الفرق المشاركة (32)</h2>
-      <ol id="teamsList" class="teams-list"></ol>
-    </aside>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc } 
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    <section class="bracket-area" id="bracketArea">
-      <!-- Rounds are injected here by script.js -->
-    </section>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDIsL5Z-36q2t2quey6EvM5JXafRTNlBNk",
+      authDomain: "tour-32.firebaseapp.com",
+      projectId: "tour-32",
+      storageBucket: "tour-32.firebasestorage.app",
+      messagingSenderId: "991439192465",
+      appId: "1:991439192465:web:cdc7a33b1a0ec35c8d9a30",
+      measurementId: "G-NDF95X5DWR"
+    };
 
-    <aside class="info-panel">
-      <div class="champ-card" id="champCard">
-        <h3>البطل</h3>
-        <div id="champion">—</div>
-      </div>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-      <div class="legend">
-        <h4>شرح</h4>
-        <p>أدخل نتيجتي كل مباراة ثم اضغط "تأكيد" — الفائز يصعد تلقائياً.</p>
-        <p>يمكنك تعديل أي نتيجة فيما بعد وسيُحدّث الترتيب.</p>
-      </div>
-    </aside>
-  </main>
+    // الفرق + شعارات
+    const teams = [
+      {name:"REAL MADRID", logo:"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg"},
+      {name:"ATLETICO MADRID", logo:"https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg"},
+      {name:"FC BARCELONA", logo:"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg"},
+      {name:"VILLARREAL", logo:"https://upload.wikimedia.org/wikipedia/en/2/26/Villarreal_CF_logo.svg"},
+      {name:"SEVILLA", logo:"https://upload.wikimedia.org/wikipedia/en/7/7b/Sevilla_FC_logo.svg"},
+      {name:"MAN UTD", logo:"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg"},
+      {name:"LIVERPOOL", logo:"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg"},
+      {name:"MANCITY", logo:"https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg"},
+      {name:"TOTTENHAM", logo:"https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg"},
+      {name:"NEWCASTLE UNITED", logo:"https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg"},
+      {name:"ARSENAL", logo:"https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg"},
+      {name:"CHELSEA", logo:"https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg"},
+      {name:"AC MILAN", logo:"https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg"},
+      {name:"INTER MILAN", logo:"https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg"},
+      {name:"ROMA", logo:"https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg"},
+      {name:"JUVENTUS", logo:"https://upload.wikimedia.org/wikipedia/commons/1/15/Juventus_FC_2017_logo.svg"},
+      {name:"NAPOLI", logo:"https://upload.wikimedia.org/wikipedia/commons/2/2d/SSC_Napoli_logo.svg"},
+      {name:"BAYERN MUNCHEN", logo:"https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_München_logo_%282017%29.svg"},
+      {name:"LEVERKUSEN", logo:"https://upload.wikimedia.org/wikipedia/en/0/0c/Bayer_04_Leverkusen_logo.svg"},
+      {name:"DORTMUND", logo:"https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg"},
+      {name:"PSG", logo:"https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg"},
+      {name:"MARSEILLE", logo:"https://upload.wikimedia.org/wikipedia/en/2/27/Olympique_de_Marseille_logo.svg"},
+      {name:"MONACO", logo:"https://upload.wikimedia.org/wikipedia/en/6/62/AS_Monaco_FC.svg"},
+      {name:"AL NASR", logo:"https://upload.wikimedia.org/wikipedia/en/4/4f/Al-Nasr_SC_Logo.png"},
+      {name:"AL HILAL", logo:"https://upload.wikimedia.org/wikipedia/en/2/2e/Al-Hilal_FC.svg"},
+      {name:"SPORTING LISBON", logo:"https://upload.wikimedia.org/wikipedia/en/5/5c/Sporting_Clube_de_Portugal_logo.svg"},
+      {name:"BENFICA", logo:"https://upload.wikimedia.org/wikipedia/en/6/6d/S.L._Benfica_logo.svg"},
+      {name:"AJAX", logo:"https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg"},
+      {name:"PSV", logo:"https://upload.wikimedia.org/wikipedia/en/2/2e/PSV_Eindhoven.svg"},
+      {name:"FLAMENGO", logo:"https://upload.wikimedia.org/wikipedia/en/e/e3/Clube_de_Regatas_do_Flamengo_logo.svg"},
+      {name:"RIVER PLATE", logo:"https://upload.wikimedia.org/wikipedia/commons/2/28/C.A._River_Plate_logo.svg"},
+      {name:"NOTTINGHAM FOREST", logo:"https://upload.wikimedia.org/wikipedia/en/6/6c/Nottingham_Forest_logo.svg"}
+    ];
 
-  <footer class="footer">
-    <p>بدعم Hatrickano — صمم خصيصاً لبطولتك 🔥</p>
-  </footer>
+    const bracketDiv = document.getElementById("bracket");
+    const winnerDiv = document.getElementById("winner");
 
-  <script src="script.js"></script>
+    // إنشاء دور 32
+    function createRound32() {
+      bracketDiv.innerHTML = "";
+      for (let i = 0; i < 32; i += 2) {
+        const matchDiv = document.createElement("div");
+        matchDiv.className = "match";
+
+        const teamA = teams[i];
+        const teamB = teams[i + 1];
+
+        matchDiv.innerHTML = `
+          <div class="team" data-name="${teamA.name}">
+            <img src="${teamA.logo}" alt="${teamA.name}" class="team-logo">
+          </div>
+          <div class="team" data-name="${teamB.name}">
+            <img src="${teamB.logo}" alt="${teamB.name}" class="team-logo">
+          </div>
+          <input type="number" class="scoreA" placeholder="0" min="0">
+          <input type="number" class="scoreB" placeholder="0" min="0">
+          <button class="submitScore">تسجيل النتيجة</button>
+        `;
+        bracketDiv.appendChild(matchDiv);
+
+        const btn = matchDiv.querySelector(".submitScore");
+        btn.addEventListener("click", () => {
+          const scoreA = parseInt(matchDiv.querySelector(".scoreA").value || 0);
+          const scoreB = parseInt(matchDiv.querySelector(".scoreB").value || 0);
+          const winner = scoreA > scoreB ? teamA.name : teamB.name;
+          alert(`الفائز: ${winner}`);
+        });
+      }
+    }
+
+    createRound32();
+  </script>
 </body>
 </html>
