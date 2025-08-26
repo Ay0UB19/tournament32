@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>بطولة eFootball — الخنفشاري</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">⚽</div>
+      <div>
+        <h1>بطولة eFootball — الخنفشاري</h1>
+        <p class="sub">32 فريق — إدخل النتائج و شوف الطريق نحو النهائي</p>
+      </div>
+    </div>
+    <div class="controls">
+      <button id="shuffleBtn" class="btn gold">إجراء القرعة (خلط الفرق)</button>
+      <button id="resetBtn" class="btn">إعادة ضبط البطولة</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <aside class="teams-panel">
+      <h2>الفرق المشاركة (32)</h2>
+      <ol id="teamsList" class="teams-list"></ol>
+    </aside>
+
+    <section class="bracket-area" id="bracketArea">
+      <!-- Rounds are injected here by script.js -->
+    </section>
+
+    <aside class="info-panel">
+      <div class="champ-card" id="champCard">
+        <h3>البطل</h3>
+        <div id="champion">—</div>
+      </div>
+
+      <div class="legend">
+        <h4>شرح</h4>
+        <p>أدخل نتيجتي كل مباراة ثم اضغط "تأكيد" — الفائز يصعد تلقائياً.</p>
+        <p>يمكنك تعديل أي نتيجة فيما بعد وسيُحدّث الترتيب.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <p>بدعم Hatrickano — صمم خصيصاً لبطولتك 🔥</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
