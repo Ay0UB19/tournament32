@@ -1,14 +1,37 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>بطولة</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بطولة كرة القدم - 32 فريق</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1 class="main-title">بطولة</h1>
-  <div id="bracket"></div>
-  <div id="winner" class="winner"></div>
+  <header>
+    <h1 class="main-title">بطولة كرة القدم - 32 فريق</h1>
+    <div class="tournament-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" id="tournamentProgress"></div>
+      </div>
+      <div class="progress-text">مرحلة دور الـ32</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="tournament-phases">
+      <button class="phase-btn active" data-phase="32">دور الـ32</button>
+      <button class="phase-btn" data-phase="16">دور الـ16</button>
+      <button class="phase-btn" data-phase="8">ربع النهائي</button>
+      <button class="phase-btn" data-phase="4">نصف النهائي</button>
+      <button class="phase-btn" data-phase="2">النهائي</button>
+    </div>
+
+    <div class="bracket-container">
+      <div id="bracket"></div>
+    </div>
+
+    <div id="winner" class="winner-container"></div>
+  </main>
 
   <!-- Firebase SDKs -->
   <script type="module">
@@ -68,41 +91,212 @@
 
     const bracketDiv = document.getElementById("bracket");
     const winnerDiv = document.getElementById("winner");
+    const progressFill = document.getElementById("tournamentProgress");
+    const phaseButtons = document.querySelectorAll('.phase-btn');
+    let currentPhase = 32;
+    let tournamentData = {
+      32: Array(16).fill().map((_, i) => ({
+        teamA: teams[i*2],
+        teamB: teams[i*2+1],
+        scoreA: null,
+        scoreB: null,
+        winner: null
+      })),
+      16: Array(8).fill().map(() => ({ teamA: null, teamB: null, scoreA: null, scoreB: null, winner: null })),
+      8: Array(4).fill().map(() => ({ teamA: null, teamB: null, scoreA: null, scoreB: null, winner: null })),
+      4: Array(2).fill().map(() => ({ teamA: null, teamB: null, scoreA: null, scoreB: null, winner: null })),
+      2: Array(1).fill().map(() => ({ teamA: null, teamB: null, scoreA: null, scoreB: null, winner: null }))
+    };
 
-    // إنشاء دور 32
-    function createRound32() {
-      bracketDiv.innerHTML = "";
-      for (let i = 0; i < 32; i += 2) {
-        const matchDiv = document.createElement("div");
-        matchDiv.className = "match";
-
-        const teamA = teams[i];
-        const teamB = teams[i + 1];
-
-        matchDiv.innerHTML = `
-          <div class="team" data-name="${teamA.name}">
-            <img src="${teamA.logo}" alt="${teamA.name}" class="team-logo">
-          </div>
-          <div class="team" data-name="${teamB.name}">
-            <img src="${teamB.logo}" alt="${teamB.name}" class="team-logo">
-          </div>
-          <input type="number" class="scoreA" placeholder="0" min="0">
-          <input type="number" class="scoreB" placeholder="0" min="0">
-          <button class="submitScore">تسجيل النتيجة</button>
-        `;
-        bracketDiv.appendChild(matchDiv);
-
-        const btn = matchDiv.querySelector(".submitScore");
-        btn.addEventListener("click", () => {
-          const scoreA = parseInt(matchDiv.querySelector(".scoreA").value || 0);
-          const scoreB = parseInt(matchDiv.querySelector(".scoreB").value || 0);
-          const winner = scoreA > scoreB ? teamA.name : teamB.name;
-          alert(`الفائز: ${winner}`);
-        });
+    // تحميل البيانات من Firebase
+    async function loadTournamentData() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "tournament"));
+        if (!querySnapshot.empty) {
+          const data = querySnapshot.docs[0].data();
+          if (data.tournamentData) {
+            tournamentData = data.tournamentData;
+            updateBracket();
+          }
+        }
+      } catch (error) {
+        console.error("Error loading tournament data: ", error);
       }
     }
 
-    createRound32();
+    // حفظ البيانات إلى Firebase
+    async function saveTournamentData() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "tournament"));
+        if (querySnapshot.empty) {
+          await addDoc(collection(db, "tournament"), { tournamentData });
+        } else {
+          const docId = querySnapshot.docs[0].id;
+          await updateDoc(doc(db, "tournament", docId), { tournamentData });
+        }
+      } catch (error) {
+        console.error("Error saving tournament data: ", error);
+      }
+    }
+
+    // إنشاء شجرة البطولة
+    function createBracket(phase) {
+      bracketDiv.innerHTML = "";
+      currentPhase = phase;
+      
+      const matches = tournamentData[phase];
+      const container = document.createElement("div");
+      container.className = `bracket-phase phase-${phase}`;
+      
+      matches.forEach((match, index) => {
+        const matchDiv = document.createElement("div");
+        matchDiv.className = "match";
+        matchDiv.dataset.index = index;
+        matchDiv.dataset.phase = phase;
+
+        let teamAContent = '<div class="team placeholder">لم يتم تحديده بعد</div>';
+        let teamBContent = '<div class="team placeholder">لم يتم تحديده بعد</div>';
+        
+        if (match.teamA) {
+          teamAContent = `
+            <div class="team ${match.winner === match.teamA.name ? 'winner' : ''}" data-name="${match.teamA.name}">
+              <img src="${match.teamA.logo}" alt="${match.teamA.name}" class="team-logo">
+              <span class="team-name">${match.teamA.name}</span>
+            </div>
+          `;
+        }
+        
+        if (match.teamB) {
+          teamBContent = `
+            <div class="team ${match.winner === match.teamB.name ? 'winner' : ''}" data-name="${match.teamB.name}">
+              <img src="${match.teamB.logo}" alt="${match.teamB.name}" class="team-logo">
+              <span class="team-name">${match.teamB.name}</span>
+            </div>
+          `;
+        }
+
+        matchDiv.innerHTML = `
+          <div class="match-header">مباراة ${index + 1}</div>
+          <div class="teams-container">
+            ${teamAContent}
+            <div class="vs">VS</div>
+            ${teamBContent}
+          </div>
+          <div class="score-inputs">
+            <input type="number" class="score-input scoreA" placeholder="0" min="0" 
+                   value="${match.scoreA !== null ? match.scoreA : ''}" 
+                   ${match.winner ? 'disabled' : ''}>
+            <span class="score-separator">-</span>
+            <input type="number" class="score-input scoreB" placeholder="0" min="0" 
+                   value="${match.scoreB !== null ? match.scoreB : ''}" 
+                   ${match.winner ? 'disabled' : ''}>
+          </div>
+          <button class="submit-score" ${match.winner ? 'disabled' : ''}>تسجيل النتيجة</button>
+          ${match.winner ? `<div class="match-winner">الفائز: ${match.winner}</div>` : ''}
+        `;
+        
+        const btn = matchDiv.querySelector(".submit-score");
+        btn.addEventListener("click", () => submitScore(matchDiv, phase, index));
+        
+        container.appendChild(matchDiv);
+      });
+      
+      bracketDiv.appendChild(container);
+      updateProgressBar();
+    }
+
+    // تسجيل النتيجة
+    function submitScore(matchDiv, phase, index) {
+      const scoreA = parseInt(matchDiv.querySelector(".scoreA").value) || 0;
+      const scoreB = parseInt(matchDiv.querySelector(".scoreB").value) || 0;
+      
+      if (scoreA === 0 && scoreB === 0) {
+        alert("يرجى إدخال النتيجة الصحيحة");
+        return;
+      }
+      
+      const match = tournamentData[phase][index];
+      match.scoreA = scoreA;
+      match.scoreB = scoreB;
+      match.winner = scoreA > scoreB ? match.teamA.name : match.teamB.name;
+      
+      // تحديث المرحلة التالية إذا كانت موجودة
+      if (phase > 2) {
+        const nextPhase = phase / 2;
+        const nextIndex = Math.floor(index / 2);
+        const nextMatch = tournamentData[nextPhase][nextIndex];
+        
+        if (index % 2 === 0) {
+          nextMatch.teamA = scoreA > scoreB ? match.teamA : match.teamB;
+        } else {
+          nextMatch.teamB = scoreA > scoreB ? match.teamA : match.teamB;
+        }
+      }
+      
+      saveTournamentData();
+      updateBracket();
+      
+      if (phase === 2 && match.winner) {
+        showWinner(match.winner);
+      }
+    }
+
+    // عرض الفائز النهائي
+    function showWinner(winner) {
+      const winnerTeam = teams.find(team => team.name === winner);
+      winnerDiv.innerHTML = `
+        <h2>البطل 🏆</h2>
+        <div class="champion-team">
+          <img src="${winnerTeam.logo}" alt="${winnerTeam.name}" class="champion-logo">
+          <div class="champion-name">${winnerTeam.name}</div>
+        </div>
+      `;
+    }
+
+    // تحديث شجرة البطولة
+    function updateBracket() {
+      createBracket(currentPhase);
+      
+      // تحديث أزرار المراحل
+      phaseButtons.forEach(btn => {
+        const phase = parseInt(btn.dataset.phase);
+        btn.classList.toggle('active', phase === currentPhase);
+      });
+    }
+
+    // تحديث شريط التقدم
+    function updateProgressBar() {
+      const phases = [32, 16, 8, 4, 2];
+      const currentIndex = phases.indexOf(currentPhase);
+      const progress = (currentIndex / (phases.length - 1)) * 100;
+      progressFill.style.width = `${progress}%`;
+      
+      const phaseNames = {
+        32: "دور الـ32",
+        16: "دور الـ16",
+        8: "ربع النهائي",
+        4: "نصف النهائي",
+        2: "النهائي"
+      };
+      
+      document.querySelector('.progress-text').textContent = `مرحلة ${phaseNames[currentPhase]}`;
+    }
+
+    // تهيئة الصفحة
+    function init() {
+      loadTournamentData();
+      createBracket(32);
+      
+      // إضافة事件 المستمعين لأزرار المراحل
+      phaseButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const phase = parseInt(btn.dataset.phase);
+          createBracket(phase);
+        });
+      });
+    }
+
+    init();
   </script>
 </body>
 </html>
